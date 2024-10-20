@@ -1,0 +1,5 @@
+# Ignore Python virtual environment folder
+venv/
+instance/
+prompt.txt
+test.py

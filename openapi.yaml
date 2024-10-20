@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  title: Library Management API
+  version: 1.0.0
+  description: API for managing books in a library system.
+servers:
+  - url: http://localhost:5000
+paths:
+  /openapi.json:
+    get:
+      summary: Get OpenAPI specification
+      responses:
+        '200':
+          description: Returns the OpenAPI specification
+          
+  /import_books:
+    post:
+      summary: Import books from an external API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                number_of_books:
+                  type: integer
+                  description: Number of books to import
+                  example: 30
+      responses:
+        '201':
+          description: Books imported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Failed to fetch books from the external API
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /books:
+    get:
+      summary: Retrieve all books
+      responses:
+        '200':
+          description: List of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    book_id:
+                      type: integer
+                      description: ID of the book
+                      example: 39763
+                    quantity:
+                      type: integer
+                      description: Quantity of the book
+                      example: 5
+
+    post:
+      summary: Create or update a book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                book_id:
+                  type: integer
+                  description: ID of the book
+                  example: 39763
+                quantity:
+                  type: integer
+                  description: Quantity of the book
+                  example: 1
+      responses:
+        '200':
+          description: Operation successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    delete:
+      summary: Delete a book or decrement its quantity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                book_id:
+                  type: integer
+                  description: ID of the book
+                  example: 39763
+                quantity:
+                  type: integer
+                  description: Quantity to decrement
+                  example: 1
+      responses:
+        '200':
+          description: Operation successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        book_id:
+          type: integer
+          description: ID of the book
+          example: 39763
+        quantity:
+          type: integer
+          description: Quantity of the book
+          example: 5
