@@ -1,85 +1,28 @@
-openapi: 3.0.0
+openapi: 3.0.1
 info:
   title: Library Management API
   version: 1.0.0
-  description: API for managing books in a library system.
+  description: API for managing a library system including books, members, rented books, and transactions.
+
 servers:
   - url: http://localhost:5000
-paths:
-  /openapi.json:
-    get:
-      summary: Get OpenAPI specification
-      responses:
-        '200':
-          description: Returns the OpenAPI specification
-          
-  /import_books:
-    post:
-      summary: Import books from an external API
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                number_of_books:
-                  type: integer
-                  description: Number of books to import
-                  example: 30
-      responses:
-        '201':
-          description: Books imported successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-        '500':
-          description: Failed to fetch books from the external API
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
 
+paths:
   /books:
     get:
-      summary: Retrieve all books
+      summary: Get all books
       responses:
         '200':
-          description: List of books
+          description: A list of books
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    book_id:
-                      type: integer
-                      description: ID of the book
-                      example: 39763
-                    quantity:
-                      type: integer
-                      description: Quantity of the book
-                      example: 5
+                  $ref: '#/components/schemas/Book'
 
     post:
-      summary: Create or update a book
+      summary: Add or update a book
       requestBody:
         required: true
         content:
@@ -89,12 +32,8 @@ paths:
               properties:
                 book_id:
                   type: integer
-                  description: ID of the book
-                  example: 39763
                 quantity:
                   type: integer
-                  description: Quantity of the book
-                  example: 1
       responses:
         '200':
           description: Operation successful
@@ -104,28 +43,10 @@ paths:
                 type: object
                 properties:
                   message:
-                    type: string
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-        '404':
-          description: Book not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
                     type: string
 
     delete:
-      summary: Delete a book or decrement its quantity
+      summary: Delete a book
       requestBody:
         required: true
         content:
@@ -135,12 +56,8 @@ paths:
               properties:
                 book_id:
                   type: integer
-                  description: ID of the book
-                  example: 39763
                 quantity:
                   type: integer
-                  description: Quantity to decrement
-                  example: 1
       responses:
         '200':
           description: Operation successful
@@ -151,25 +68,158 @@ paths:
                 properties:
                   message:
                     type: string
-        '400':
-          description: Invalid request
+
+  /members:
+    get:
+      summary: Get all members
+      responses:
+        '200':
+          description: A list of members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Member'
+
+    post:
+      summary: Create a new member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Member created successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  error:
+                  message:
                     type: string
-        '404':
-          description: Book not found
+                  member_id:
+                    type: integer
+
+    delete:
+      summary: Delete a member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                member_id:
+                  type: integer
+      responses:
+        '200':
+          description: Member deleted successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  error:
+                  message:
                     type: string
-                    
+
+  /rent:
+    post:
+      summary: Rent books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  member_id:
+                    type: integer
+                  rented_books:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        book_id:
+                          type: integer
+                        quantity:
+                          type: integer
+      responses:
+        '201':
+          description: Books rented successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    delete:
+      summary: Return rented books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  member_id:
+                    type: integer
+                  rented_books:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        book_id:
+                          type: integer
+                        quantity:
+                          type: integer
+      responses:
+        '200':
+          description: Books returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    get:
+      summary: Get all rented books
+      responses:
+        '200':
+          description: A list of rented books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentedBook'
+
+  /transactions:
+    get:
+      summary: Get all transactions
+      responses:
+        '200':
+          description: A list of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+
 components:
   schemas:
     Book:
@@ -177,9 +227,41 @@ components:
       properties:
         book_id:
           type: integer
-          description: ID of the book
-          example: 39763
         quantity:
           type: integer
-          description: Quantity of the book
-          example: 5
+
+    Member:
+      type: object
+      properties:
+        member_id:
+          type: integer
+        name:
+          type: string
+        debt:
+          type: number
+
+    RentedBook:
+      type: object
+      properties:
+        id:
+          type: integer
+        book_id:
+          type: integer
+        member_id:
+          type: integer
+        quantity:
+          type: integer
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        book_id:
+          type: integer
+        member_id:
+          type: integer
+        quantity:
+          type: integer
+        action:
+          type: string
