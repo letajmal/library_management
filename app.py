@@ -28,8 +28,21 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # Define the Books table
-class Book(db.Model):
+class Books(db.Model):
     book_id = db.Column(db.Integer, primary_key=True)
+    quantity = db.Column(db.Integer, nullable=False)
+
+# Define the Members table
+class Members(db.Model):
+    member_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    debt = db.Column(db.Float, nullable=False, default=0)
+
+# Define the RentedBooks table
+class RentedBooks(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'), nullable=False)
+    member_id = db.Column(db.Integer, db.ForeignKey('members.member_id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
 
 # Create the database tables
@@ -45,7 +58,7 @@ def book_crud(method, book_id, quantity=None):
     if quantity is None:
         quantity = 1
 
-    existing_book = Book.query.filter_by(book_id=book_id).first()
+    existing_book = Books.query.filter_by(book_id=book_id).first()
     
     if existing_book:
         if method == 'POST':
@@ -62,7 +75,7 @@ def book_crud(method, book_id, quantity=None):
         if method == 'DELETE':
             return jsonify({"error": "Book not found."}), 404
         # If the book does not exist, create a new entry with the specified quantity
-        new_book = Book(book_id=book_id, quantity=quantity)  # Use the provided quantity
+        new_book = Books(book_id=book_id, quantity=quantity)  # Use the provided quantity
         db.session.add(new_book)
 
     db.session.commit()
@@ -120,7 +133,7 @@ def import_books():
 # Read all books
 @app.route('/books', methods=['GET'])
 def get_books():
-    books = Book.query.all()
+    books = Books.query.all()
     return jsonify([{"book_id": book.book_id, "quantity": book.quantity} for book in books]), 200
 
 @app.route('/books', methods=['POST', 'DELETE'])
@@ -131,12 +144,57 @@ def manage_book():
     quantity = data.get('quantity', 1)  # Default to 1 if not specified
 
     if not book_id:
-        return jsonify({"error": "Book ID is required."}), 400
+        return jsonify({"error": "Books ID is required."}), 400
 
     if quantity <= 0:
         return jsonify({"error": "Quantity must be greater than zero."}), 400
 
     return book_crud(method, book_id, quantity)
+
+# CRUD for Members
+
+@app.route('/members', methods=['POST', 'DELETE'])
+def members_crud():
+    data = request.get_json()
+
+    # Handle POST request to create a new member
+    if request.method == 'POST':
+        name = data.get('name')
+        if not name:
+            return jsonify({"error": "Name is required"}), 400
+
+        # Create and add a new member
+        new_member = Members(name=name)
+        db.session.add(new_member)
+        db.session.commit()
+
+        return jsonify({"message": "Member created successfully", "member_id": new_member.member_id}), 201
+
+    # Handle DELETE request to delete a member
+    elif request.method == 'DELETE':
+        member_id = data.get('member_id')  # Retrieve the member_id from the request payload
+        if not member_id:
+            return jsonify({"error": "Member ID is required"}), 400
+
+        # Check if the member exists
+        member = Members.query.get_or_404(member_id)
+
+        # Check if the member has rented books
+        rented_books = RentedBooks.query.filter_by(member_id=member_id).all()
+        if rented_books:
+            return jsonify({"error": "Cannot delete member with rented books."}), 400
+
+        # If no rented books, proceed with deleting the member
+        db.session.delete(member)
+        db.session.commit()
+
+        return jsonify({"message": "Member deleted successfully"}), 200
+
+# Get all members and their debts
+@app.route('/members', methods=['GET'])
+def get_members():
+    members = Members.query.all()
+    return jsonify([{"member_id": member.member_id, "name": member.name, "debt": member.debt} for member in members]), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
