@@ -65,7 +65,7 @@ def book_crud(method, book_id, quantity=None):
             # If the book exists, increment the quantity
             existing_book.quantity += quantity
         elif method == 'DELETE':
-            if existing_book.quantity > 0:
+            if existing_book.quantity >= quantity:
                 existing_book.quantity -= quantity
                 if existing_book.quantity < 0:
                     existing_book.quantity = 0  # Prevent negative quantity
