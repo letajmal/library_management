@@ -45,6 +45,13 @@ class RentedBooks(db.Model):
     member_id = db.Column(db.Integer, db.ForeignKey('members.member_id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
 
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'), nullable=False)
+    member_id = db.Column(db.Integer, db.ForeignKey('members.member_id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    action = db.Column(db.String(10), nullable=False)
+
 # Create the database tables
 with app.app_context():
     db.create_all()
@@ -195,6 +202,109 @@ def members_crud():
 def get_members():
     members = Members.query.all()
     return jsonify([{"member_id": member.member_id, "name": member.name, "debt": member.debt} for member in members]), 200
+
+@app.route('/rent', methods=['POST', 'DELETE'])
+def rent_books():
+    data = request.get_json()
+
+    if request.method == 'POST':
+        for entry in data:
+            member_id = entry.get('member_id')
+            # Check if the member exists
+            member = Members.query.get_or_404(member_id)
+
+            rented_books = entry.get('rented_books', [])
+            
+            for book in rented_books:
+                book_id = book.get('book_id')
+                quantity = int(book.get('quantity', 1))
+
+                # Check if enough stock is available
+                book_record = Books.query.get_or_404(book_id)
+                if book_record.quantity < quantity:
+                    return jsonify({"error": f"Not enough stock for book ID {book_id}"}), 400
+
+                # Create an entry in RentedBooks
+                rented_book = RentedBooks(member_id=member_id, book_id=book_id, quantity=quantity)
+                db.session.add(rented_book)
+
+                # Decrement stock in Books
+                book_record.quantity -= quantity
+
+                # Create a new transaction for returning
+                return_transaction = Transactions(book_id=book_id, member_id=member_id, quantity=quantity, action='rent')
+                db.session.add(return_transaction)
+
+        # Commit the session
+        db.session.commit()
+
+        return jsonify({"message": "Books rented successfully."}), 201
+
+    elif request.method == 'DELETE':
+        for entry in data:
+            member_id = entry.get('member_id')
+            # Check if the member exists
+            member = Members.query.get_or_404(member_id)
+
+            rented_books = entry.get('rented_books', [])
+
+            for book in rented_books:
+                book_id = book.get('book_id')
+                quantity = int(book.get('quantity', 1))
+
+                # Find the rented book record
+                rented_book_record = RentedBooks.query.filter_by(member_id=member_id, book_id=book_id).first()
+                if not rented_book_record or rented_book_record.quantity < quantity:
+                    return jsonify({"error": f"Not enough rented quantity for book ID {book_id}"}), 400
+
+                # Decrement quantity in RentedBooks
+                rented_book_record.quantity -= quantity
+                
+                # Increase stock in Books
+                book_record = Books.query.get(book_id)
+                if book_record:
+                    book_record.quantity += quantity
+                
+                # Remove the rented book record if the quantity goes to 0
+                if rented_book_record.quantity == 0:
+                    db.session.delete(rented_book_record)
+
+                # Create a new transaction
+                transaction = Transactions(book_id=book_id, member_id=member_id, quantity=quantity, action='return')
+                db.session.add(transaction)
+
+        # Commit the session
+        db.session.commit()
+
+        return jsonify({"message": "Books returned successfully."}), 200
+
+@app.route('/rent', methods=['GET'])
+def get_rent():
+    rented_book_record = RentedBooks.query.all()
+    return jsonify([
+        {
+            "id": rent.id, 
+            "book_id": rent.book_id, 
+            "member_id": rent.member_id, 
+            "quantity": rent.quantity
+        } for rent in rented_book_record
+    ]), 200
+
+@app.route('/transactions', methods=['GET'])
+def get_transactions():
+    # Fetch all transactions
+    transaction_records = Transactions.query.all()
+    
+    # Format the transactions into a JSON serializable format
+    return jsonify([
+        {
+            "id": txn.id,
+            "book_id": txn.book_id,
+            "member_id": txn.member_id,
+            "quantity": txn.quantity,
+            "action": txn.action
+        } for txn in transaction_records
+    ]), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
