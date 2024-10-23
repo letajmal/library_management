@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_swagger_ui import get_swaggerui_blueprint
 import yaml
@@ -55,6 +55,10 @@ class Transactions(db.Model):
 # Create the database tables
 with app.app_context():
     db.create_all()
+
+@app.route('/')
+def hello():
+    return render_template('books.html')
 
 @app.route('/openapi.json')
 def openapi_json():
