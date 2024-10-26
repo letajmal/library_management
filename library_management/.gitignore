@@ -1,7 +1,4 @@
-venv/
 instance/
-prompt.txt
-test.py
 .venv/
 
 *.pyc
@@ -14,4 +11,3 @@ htmlcov/
 dist/
 build/
 *.egg-info/
-idea

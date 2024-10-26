@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>books</title>
+    <style>
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      tr:nth-child(even) {
+        background-color: #D6EEEE;
+      }
+      .container {
+        display: flex;    /* This makes the container a flex container */
+      }
+      .form-section {
+        width: 20%;      /* Takes 20% of the container width */
+        padding: 10px;
+      }
+      .table-section {
+          width: 80%;      /* Takes 80% of the container width */
+          padding: 10px;
+      }
+      input[type="text"], input[type="number"] {
+          width: 95%;
+          margin-bottom: 10px;
+      }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-section">
+      <form action="{{ url_for('books.import_books') }}" method="post">
+
+        <label for="nbooks">Number of Books to import:</label><br>
+        <input type="number" id="nbooks" name="nbooks" value="{{ request.form['nbooks'] }}"><br>
+
+        <label for="title">Title of the Book:</label><br>
+        <input type="text" id="title" name="title" value="{{ request.form['title'] }}"><br>
+
+        <label for="authors">Name of the Author:</label><br>
+        <input type="text" id="authors" name="authors" value="{{ request.form['authors'] }}"><br>
+
+        <label for="isbn">ISBN:</label><br>
+        <input type="text" id="isbn" name="isbn" value="{{ request.form['isbn'] }}"><br>
+
+        <label for="publisher">Publisher:</label><br>
+        <input type="text" id="publisher" name="publisher" value="{{ request.form['publisher'] }}"><br>
+
+        <label for="page">Page No:</label><br>
+        <input type="number" id="page" name="page" value="{{ request.form['page'] }}"><br>
+
+        <input type="submit" name="action" value="Search">
+        <input type="submit" name="action" value="Import"><br>
+      </form>
+    </div>
+    {% if books %}
+    <div class="table-section">
+      <table style="width:95%">
+        <tr>
+          <th>bookID</th>
+          <th>title</th>
+          <th>authors</th>
+          <th>average_rating</th>
+          <th>isbn</th>
+          <th>isbn13</th>
+          <th>language_code</th>
+          <th>num_pages</th>
+          <th>ratings_count</th>
+          <th>text_reviews_count</th>
+          <th>publication_date</th>
+          <th>publisher</th>
+        </tr>
+        {% for book in books %}
+        <tr>
+          <td>{{ book.bookID }}</td>
+          <td>{{ book.title }}</td>
+          <td>{{ book.authors }}</td>
+          <td>{{ book.average_rating }}</td>
+          <td>{{ book.isbn }}</td>
+          <td>{{ book.isbn13 }}</td>
+          <td>{{ book.language_code }}</td>
+          <td>{{ book.get('  num_pages') }}</td>
+          <td>{{ book.ratings_count }}</td>
+          <td>{{ book.text_reviews_count }}</td>
+          <td>{{ book.publication_date }}</td>
+          <td>{{ book.publisher }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+    {% if error %}
+    <p>{{ error }}</p>
+    {% endif %}
+  </div>
+</body>
+</html>
