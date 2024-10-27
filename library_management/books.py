@@ -64,11 +64,11 @@ def index():
                     Books_table.authors.ilike(f"%{authors}%")
                 ).all()
                 # Display results if successful
-                return render_template('books_import.html', books=books, page_uri='books')
+                return render_template('index.html', books=books, page_uri='books')
 
             except Exception as e:
                 # If any error occurs during API request, show error message
-                return render_template('books_import.html', error=str(e), page_uri='books')
+                return render_template('index.html', error=str(e), page_uri='books')
         
         # Handle Update action
         elif action == 'Update':
@@ -83,11 +83,11 @@ def index():
                     raise Exception("Book Not Found")
             except Exception as e:
                 # If any error occurs during API request, show error message
-                return render_template('books_import.html', error=str(e), page_uri='books')
+                return render_template('index.html', error=str(e), page_uri='books')
         
 
     books = Books_table.query.all()
-    return render_template('books_import.html', books=books, page_uri='books')
+    return render_template('index.html', books=books, page_uri='books')
 
 @bp.route('/import', methods=('GET', 'POST'))
 def import_books():
@@ -131,15 +131,15 @@ def import_books():
                 # Request books from Frappe API
                 books = request_frappe_api(params)
                 # Display results if successful
-                return render_template('books_import.html', books=books, page_uri='books_import')
+                return render_template('index.html', books=books, page_uri='books_import')
             except Exception as e:
                 # If any error occurs during API request, show error message
-                return render_template('books_import.html', error=str(e), page_uri='books_import')
+                return render_template('index.html', error=str(e), page_uri='books_import')
         
         # Handle Import action
         elif action == 'Import':
             if number_of_books <= 0:
-                return render_template('books_import.html', error="Number of Books should be greater than 0", page_uri='books_import')
+                return render_template('index.html', error="Number of Books should be greater than 0", page_uri='books_import')
             imported_books = 0
             page = 1
             
@@ -157,7 +157,7 @@ def import_books():
                     if "Books Not Found" in error_message:
                         break
                     # If any error occurs during API request, show error message
-                    return render_template('books_import.html', error=str(e), page_uri='books_import')
+                    return render_template('index.html', error=str(e), page_uri='books_import')
 
                 # Iterate through the books and import them
                 for book in books:
@@ -193,10 +193,10 @@ def import_books():
                 # Move to the next page
                 page += 1
             db.session.commit()
-            return render_template('books_import.html', error=f'{imported_books}/{number_of_books} were imported', page_uri='books_import')
+            return render_template('index.html', error=f'{imported_books}/{number_of_books} were imported', page_uri='books_import')
 
     # Handle GET request - display empty form
-    return render_template('books_import.html', page_uri='books_import')
+    return render_template('index.html', page_uri='books_import')
 
 # title, authors, isbn, publisher and page
 

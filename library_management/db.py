@@ -19,3 +19,24 @@ class Books_table(db.Model):
     publication_date = db.Column(db.String(10)) 
     publisher = db.Column(db.String(255))
     quantity = db.Column(db.Integer)
+
+# Define the Members table
+class Members_table(db.Model):
+    __tablename__ = 'members'  # Set the name of the table explicitly
+    member_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    debt = db.Column(db.Float, nullable=False, default=0)
+
+# Define the RentedBooks table
+class RentedBooks(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bookID = db.Column(db.Integer, db.ForeignKey('books.bookID'), nullable=False)
+    member_id = db.Column(db.Integer, db.ForeignKey('members.member_id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bookID = db.Column(db.Integer, db.ForeignKey('books.bookID'), nullable=False)
+    member_id = db.Column(db.Integer, db.ForeignKey('members.member_id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    action = db.Column(db.String(10), nullable=False)

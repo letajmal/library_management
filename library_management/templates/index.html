@@ -123,6 +123,66 @@
       </table>
     </div>
     {% endif %}
+    {% if members %}
+    <div class="table-section">
+      <table style="width:95%">
+        <tr>
+          <th>Member ID</th>
+          <th>Name</th>
+          <th>Debt</th>
+        </tr>
+        {% for member in members %}
+        <tr>
+          <td>{{ member.member_id }}</td>
+          <td>{{ member.name }}</td>
+          <td>{{ member.debt }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+    {% if rented_books %}
+    <div class="table-section">
+      <table style="width:95%">
+        <tr>
+          <th>ID</th>
+          <th>Book ID</th>
+          <th>Member ID</th>
+          <th>Quantity</th>
+        </tr>
+        {% for book in rented_books %}
+        <tr>
+          <td>{{ book.id }}</td>
+          <td>{{ book.bookID }}</td>
+          <td>{{ book.member_id }}</td>
+          <td>{{ book.quantity }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+    {% if transactions %}
+    <div class="table-section">
+      <table style="width:95%">
+        <tr>
+          <th>ID</th>
+          <th>Book ID</th>
+          <th>Member ID</th>
+          <th>Quantity</th>
+          <th>Action</th>
+        </tr>
+        {% for transaction in transactions %}
+        <tr>
+          <td>{{ transaction.id }}</td>
+          <td>{{ transaction.bookID }}</td>
+          <td>{{ transaction.member_id }}</td>
+          <td>{{ transaction.quantity }}</td>
+          <td>{{ transaction.action }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
     {% if error %}
     <p>{{ error }}</p>
     {% endif %}
