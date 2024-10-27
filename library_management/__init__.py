@@ -4,7 +4,7 @@ from flask import Flask
 
 def create_app(test_config=None):
     from . import books
-    from .db import db
+    from .db import db, Books_table
 
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)

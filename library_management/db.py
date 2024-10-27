@@ -4,9 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 # Define the Books table
-class Books(db.Model):
+class Books_table(db.Model):
     __tablename__ = 'books'  # Set the name of the table explicitly
-    book_id = db.Column(db.String(20), primary_key=True)
+    bookID = db.Column(db.String(20), primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     authors = db.Column(db.String(255), nullable=False)
     average_rating = db.Column(db.Float)
@@ -16,6 +16,6 @@ class Books(db.Model):
     num_pages = db.Column(db.Integer)
     ratings_count = db.Column(db.Integer)
     text_reviews_count = db.Column(db.Integer)
-    publication_date = db.Column(db.Date)
+    publication_date = db.Column(db.String(10)) 
     publisher = db.Column(db.String(255))
     quantity = db.Column(db.Integer)
