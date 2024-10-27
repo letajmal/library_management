@@ -40,7 +40,7 @@
         <label for="authors">Name of the Author:</label><br>
         <input type="text" id="authors" name="authors" value="{{ request.form['authors'] }}"><br>
 
-        <input type="submit" name="action" value="Search">
+        <input type="submit" name="action" value="Search"><br>
       </form>
       <form action="{{ url_for('books.index') }}" method="post">
 
@@ -76,6 +76,24 @@
 
         <input type="submit" name="action" value="Search">
         <input type="submit" name="action" value="Import"><br>
+      </form>
+      {% endif %}
+      {% if page_uri == 'members' %}
+      <form action="{{ url_for('members.index') }}" method="post">
+
+        <label for="name">Name of the Member:</label><br>
+        <input type="text" id="name" name="name" value="{{ request.form['name'] }}" required><br>
+
+        <input type="submit" name="action" value="Add">
+
+      </form>
+      <form action="{{ url_for('members.index') }}" method="post">
+
+        <label for="member_id">ID:</label><br>
+        <input type="text" id="member_id" name="member_id" value="{{ request.form['member_id'] }}" required><br>
+
+        <input type="submit" name="action" value="Delete"><br>
+
       </form>
       {% endif %}
     </div>
@@ -183,8 +201,8 @@
       </table>
     </div>
     {% endif %}
-    {% if error %}
-    <p>{{ error }}</p>
+    {% if message %}
+    <p>{{ message }}</p>
     {% endif %}
   </div>
 </body>

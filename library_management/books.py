@@ -68,7 +68,7 @@ def index():
 
             except Exception as e:
                 # If any error occurs during API request, show error message
-                return render_template('index.html', error=str(e), page_uri='books')
+                return render_template('index.html', message=str(e), page_uri='books')
         
         # Handle Update action
         elif action == 'Update':
@@ -83,7 +83,7 @@ def index():
                     raise Exception("Book Not Found")
             except Exception as e:
                 # If any error occurs during API request, show error message
-                return render_template('index.html', error=str(e), page_uri='books')
+                return render_template('index.html', message=str(e), page_uri='books')
         
 
     books = Books_table.query.all()
@@ -134,12 +134,12 @@ def import_books():
                 return render_template('index.html', books=books, page_uri='books_import')
             except Exception as e:
                 # If any error occurs during API request, show error message
-                return render_template('index.html', error=str(e), page_uri='books_import')
+                return render_template('index.html', message=str(e), page_uri='books_import')
         
         # Handle Import action
         elif action == 'Import':
             if number_of_books <= 0:
-                return render_template('index.html', error="Number of Books should be greater than 0", page_uri='books_import')
+                return render_template('index.html', message="Number of Books should be greater than 0", page_uri='books_import')
             imported_books = 0
             page = 1
             
@@ -157,7 +157,7 @@ def import_books():
                     if "Books Not Found" in error_message:
                         break
                     # If any error occurs during API request, show error message
-                    return render_template('index.html', error=str(e), page_uri='books_import')
+                    return render_template('index.html', message=str(e), page_uri='books_import')
 
                 # Iterate through the books and import them
                 for book in books:
@@ -193,7 +193,7 @@ def import_books():
                 # Move to the next page
                 page += 1
             db.session.commit()
-            return render_template('index.html', error=f'{imported_books}/{number_of_books} were imported', page_uri='books_import')
+            return render_template('index.html', message=f'{imported_books}/{number_of_books} were imported', page_uri='books_import')
 
     # Handle GET request - display empty form
     return render_template('index.html', page_uri='books_import')

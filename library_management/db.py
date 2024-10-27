@@ -28,7 +28,7 @@ class Members_table(db.Model):
     debt = db.Column(db.Float, nullable=False, default=0)
 
 # Define the RentedBooks table
-class RentedBooks(db.Model):
+class IssuedBooks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bookID = db.Column(db.Integer, db.ForeignKey('books.bookID'), nullable=False)
     member_id = db.Column(db.Integer, db.ForeignKey('members.member_id'), nullable=False)
