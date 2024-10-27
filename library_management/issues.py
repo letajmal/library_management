@@ -53,9 +53,6 @@ def index():
                 else:
                     issued_book_record.quantity += quantity
 
-                # increasing debt
-                member_record.debt = total_debt
-
                 # Decrement stock in Books
                 book_record.quantity -= quantity
             
@@ -80,8 +77,8 @@ def index():
                 if total_debt < 0:
                     total_debt = 0
 
-                # increasing debt
-                member_record.debt = total_debt
+            # Updating debt
+            member_record.debt = total_debt
 
             # Create a new transaction
             transaction = Transactions(bookID=bookID, member_id=member_id, quantity=quantity, action=action)
