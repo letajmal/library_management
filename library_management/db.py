@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 # Initialize SQLAlchemy
 db = SQLAlchemy()
@@ -40,3 +41,4 @@ class Transactions(db.Model):
     member_id = db.Column(db.Integer, db.ForeignKey('members.member_id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     action = db.Column(db.String(10), nullable=False)
+    time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

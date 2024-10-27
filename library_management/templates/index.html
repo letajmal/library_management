@@ -96,6 +96,22 @@
 
       </form>
       {% endif %}
+      {% if page_uri == 'issues' %}
+      <form action="{{ url_for('issues.index') }}" method="post">
+        
+        <label for="member_id">Member ID:</label><br>
+        <input type="text" id="member_id" name="member_id" value="{{ request.form['member_id'] }}" required><br>
+
+        <label for="bookID">Book ID:</label><br>
+        <input type="text" id="bookID" name="bookID" value="{{ request.form['bookID'] }}" required><br>
+
+        <label for="quantity">Quantity:</label><br>
+        <input type="number" id="quantity" name="quantity" value="{{ request.form['quantity'] }}" required><br>
+
+        <input type="submit" name="action" value="Issue">
+        <input type="submit" name="action" value="Return"><br>
+      </form>
+      {% endif %}
     </div>
     {% if books %}
     <div class="table-section">
@@ -159,7 +175,7 @@
       </table>
     </div>
     {% endif %}
-    {% if rented_books %}
+    {% if issues %}
     <div class="table-section">
       <table style="width:95%">
         <tr>
@@ -168,7 +184,7 @@
           <th>Member ID</th>
           <th>Quantity</th>
         </tr>
-        {% for book in rented_books %}
+        {% for book in issues %}
         <tr>
           <td>{{ book.id }}</td>
           <td>{{ book.bookID }}</td>
