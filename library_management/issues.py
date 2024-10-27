@@ -33,30 +33,38 @@ def index():
             else:
                 raise Exception(f"Book ID is required")
 
-            if book_record.quantity < quantity:
-                raise Exception(f"Not enough stock for book ID {bookID}")
             debt = quantity * 10
+
+            # Find the issued book record
+            issued_book_record = IssuedBooks.query.filter_by(member_id=member_id, bookID=bookID).first()
             
             if action == 'Issue':
-                total_debt = int(member_record.debt) + debt
+                if book_record.quantity < quantity:
+                    raise Exception(f"Not enough stock for book ID {bookID}")
+
+                total_debt = member_record.debt + debt
                 if total_debt >= 500:
                     raise Exception("Issue is not allowed because the debt will exceed the RS.500 limit")
-                
-                # Create an entry in IssuedBooks
-                rented_book = IssuedBooks(member_id=member_id, bookID=bookID, quantity=quantity)
-                db.session.add(rented_book)
+
+                if issued_book_record == None:
+                    # Create an entry in IssuedBooks
+                    issued_book = IssuedBooks(member_id=member_id, bookID=bookID, quantity=quantity)
+                    db.session.add(issued_book)
+                else:
+                    issued_book_record.quantity += quantity
+
+                # increasing debt
+                member_record.debt = total_debt
 
                 # Decrement stock in Books
                 book_record.quantity -= quantity
             
             elif action == 'Return':
-                # Find the issued book record
-                issued_book_record = IssuedBooks.query.filter_by(member_id=member_id, bookID=bookID).first()
                 if issued_book_record == None:
                     raise Exception("No Issue Record found")
 
                 if issued_book_record.quantity < quantity:
-                    return Exception(f"Not enough rented quantity for book ID {bookID}")
+                    raise Exception(f"Not enough rented quantity for book ID {bookID}")
 
                 # Decrement quantity in IssuedBooks
                 issued_book_record.quantity -= quantity
@@ -67,6 +75,13 @@ def index():
                 # Remove the rented book record if the quantity goes to 0
                 if issued_book_record.quantity == 0:
                     db.session.delete(issued_book_record)
+
+                total_debt = member_record.debt - debt
+                if total_debt < 0:
+                    total_debt = 0
+
+                # increasing debt
+                member_record.debt = total_debt
 
             # Create a new transaction
             transaction = Transactions(bookID=bookID, member_id=member_id, quantity=quantity, action=action)
