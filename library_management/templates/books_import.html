@@ -31,6 +31,29 @@
 <body>
   <div class="container">
     <div class="form-section">
+      {% if page_uri == 'books' %}
+      <form action="{{ url_for('books.index') }}" method="post">
+
+        <label for="title">Title of the Book:</label><br>
+        <input type="text" id="title" name="title" value="{{ request.form['title'] }}"><br>
+
+        <label for="authors">Name of the Author:</label><br>
+        <input type="text" id="authors" name="authors" value="{{ request.form['authors'] }}"><br>
+
+        <input type="submit" name="action" value="Search">
+      </form>
+      <form action="{{ url_for('books.index') }}" method="post">
+
+        <label for="isbn">Book ID:</label><br>
+        <input type="text" id="bookID" name="bookID" value="{{ request.form['bookID'] }}"><br>
+
+        <label for="publisher">Quantity:</label><br>
+        <input type="number" id="quantity" name="quantity" value="{{ request.form['quantity'] }}"><br>
+
+        <input type="submit" name="action" value="Update"><br>
+      </form>
+      {% endif %}
+      {% if page_uri == 'books_import' %}
       <form action="{{ url_for('books.import_books') }}" method="post">
 
         <label for="nbooks">Number of Books to import:</label><br>
@@ -54,6 +77,7 @@
         <input type="submit" name="action" value="Search">
         <input type="submit" name="action" value="Import"><br>
       </form>
+      {% endif %}
     </div>
     {% if books %}
     <div class="table-section">
@@ -66,11 +90,14 @@
           <th>isbn</th>
           <th>isbn13</th>
           <th>language_code</th>
-          <th>num_pages</th>
           <th>ratings_count</th>
           <th>text_reviews_count</th>
           <th>publication_date</th>
           <th>publisher</th>
+          <th>num_pages</th>
+          {% if page_uri != 'books_import' %}
+          <th>quantity</th>
+          {% endif %}
         </tr>
         {% for book in books %}
         <tr>
@@ -81,11 +108,16 @@
           <td>{{ book.isbn }}</td>
           <td>{{ book.isbn13 }}</td>
           <td>{{ book.language_code }}</td>
-          <td>{{ book.get('  num_pages') }}</td>
           <td>{{ book.ratings_count }}</td>
           <td>{{ book.text_reviews_count }}</td>
           <td>{{ book.publication_date }}</td>
           <td>{{ book.publisher }}</td>
+          {% if page_uri == 'books_import' %}
+          <td>{{ book.get('  num_pages') }}</td>
+          {% else %}
+          <td>{{ book.num_pages }}</td>
+          <td>{{ book.quantity }}</td>
+          {% endif %}
         </tr>
         {% endfor %}
       </table>

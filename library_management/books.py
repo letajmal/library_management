@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, request, flash
+from flask import Flask, render_template, Blueprint, request
 import requests
 from .db import db, Books_table
 
@@ -38,9 +38,56 @@ def request_frappe_api(params):
     except ValueError as e:
         raise Exception(f"Invalid response from API: {str(e)}")
 
-@bp.route('/')
+@bp.route('/', methods=('GET', 'POST'))
 def index():
-    return render_template('index.html')
+    # Handle POST request (form submission)
+    if request.method == 'POST':
+        # Extract form data with default empty strings if fields are missing
+        action = request.form.get('action', '')  # Button clicked ('Search' or 'Update')
+        title = request.form.get('title', '')    # Book title to search for
+        authors = request.form.get('authors', '') # Author names to search for
+        bookID = request.form.get('bookID', '')      # bookID to update
+
+        # Safely convert number of books to integer
+        try:
+            quantity = int(request.form.get('quantity'))
+            if quantity < 0:
+                raise Exception  # Prevent negative quantity
+        except:
+            quantity = 0  # Default to 0 if conversion fails
+
+        if action == 'Search':
+            try:
+                # Request books from Frappe API
+                books = Books_table.query.filter(
+                    Books_table.title.ilike(f"%{title}%"),
+                    Books_table.authors.ilike(f"%{authors}%")
+                ).all()
+                # Display results if successful
+                return render_template('books_import.html', books=books, page_uri='books')
+
+            except Exception as e:
+                # If any error occurs during API request, show error message
+                return render_template('books_import.html', error=str(e), page_uri='books')
+        
+        # Handle Update action
+        elif action == 'Update':
+            try:
+                # Request books from Frappe API
+                existing_book = Books_table.query.filter_by(bookID=bookID).first()
+    
+                if existing_book:
+                    existing_book.quantity = quantity
+                    db.session.commit()
+                else:
+                    raise Exception("Book Not Found")
+            except Exception as e:
+                # If any error occurs during API request, show error message
+                return render_template('books_import.html', error=str(e), page_uri='books')
+        
+
+    books = Books_table.query.all()
+    return render_template('books_import.html', books=books, page_uri='books')
 
 @bp.route('/import', methods=('GET', 'POST'))
 def import_books():
@@ -84,15 +131,15 @@ def import_books():
                 # Request books from Frappe API
                 books = request_frappe_api(params)
                 # Display results if successful
-                return render_template('books_import.html', books=books)
+                return render_template('books_import.html', books=books, page_uri='books_import')
             except Exception as e:
                 # If any error occurs during API request, show error message
-                return render_template('books_import.html', error=str(e))
+                return render_template('books_import.html', error=str(e), page_uri='books_import')
         
         # Handle Import action
         elif action == 'Import':
             if number_of_books <= 0:
-                return render_template('books_import.html', error="Number of Books should be greater than 0")
+                return render_template('books_import.html', error="Number of Books should be greater than 0", page_uri='books_import')
             imported_books = 0
             page = 1
             
@@ -104,11 +151,13 @@ def import_books():
                 try:
                     # Request books from Frappe API
                     books = request_frappe_api(params)
-                except Exception == "Books Not Found":
-                    break
                 except Exception as e:
+                    error_message = str(e)  # Convert exception to string for easier handling
+                    # Check for specific messages in the exception
+                    if "Books Not Found" in error_message:
+                        break
                     # If any error occurs during API request, show error message
-                    return render_template('books_import.html', error=str(e))
+                    return render_template('books_import.html', error=str(e), page_uri='books_import')
 
                 # Iterate through the books and import them
                 for book in books:
@@ -144,10 +193,10 @@ def import_books():
                 # Move to the next page
                 page += 1
             db.session.commit()
-            return render_template('books_import.html')
+            return render_template('books_import.html', error=f'{imported_books}/{number_of_books} were imported', page_uri='books_import')
 
     # Handle GET request - display empty form
-    return render_template('books_import.html')
+    return render_template('books_import.html', page_uri='books_import')
 
 # title, authors, isbn, publisher and page
 
