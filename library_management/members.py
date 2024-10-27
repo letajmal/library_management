@@ -1,5 +1,4 @@
-from flask import Flask, render_template, Blueprint, request
-import requests
+from flask import render_template, Blueprint, request
 from .db import db, Members_table, IssuedBooks
 
 bp = Blueprint('members', __name__, url_prefix='/members')

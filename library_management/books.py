@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, request
+from flask import render_template, Blueprint, request
 import requests
 from .db import db, Books_table
 
