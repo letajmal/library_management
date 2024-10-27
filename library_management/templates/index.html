@@ -204,6 +204,7 @@
           <th>Member ID</th>
           <th>Quantity</th>
           <th>Action</th>
+          <th>Time</th>
         </tr>
         {% for transaction in transactions %}
         <tr>
@@ -212,6 +213,7 @@
           <td>{{ transaction.member_id }}</td>
           <td>{{ transaction.quantity }}</td>
           <td>{{ transaction.action }}</td>
+          <td>{{ transaction.time }}</td>
         </tr>
         {% endfor %}
       </table>
