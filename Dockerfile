@@ -10,14 +10,16 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
+# Copy the entire application
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 5000
+# Make the startup script executable
+COPY startup.sh .
+RUN chmod +x startup.sh
 
-# Set environment variable for Flask app
+# Set environment variables
 ENV FLASK_APP=library_management
+ENV PORT=8080
 
-# Command to run the application
-CMD ["flask", "run", "--host=0.0.0.0"]
+# Use the startup script as the entrypoint
+ENTRYPOINT ["./startup.sh"]
