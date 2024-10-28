@@ -3,7 +3,7 @@ import os
 from flask import Flask
 
 def create_app(test_config=None):
-    from . import books, members, issues, transactions
+    from . import books, members, issues, transactions, home
     from .db import db, Books_table, Members_table, IssuedBooks, Transactions
 
     # create and configure the app
@@ -34,6 +34,7 @@ def create_app(test_config=None):
         db.create_all()
 
     # registering blueprints with app
+    app.register_blueprint(home.bp)
     app.register_blueprint(books.bp)
     app.register_blueprint(members.bp)
     app.register_blueprint(issues.bp)

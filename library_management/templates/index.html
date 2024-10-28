@@ -4,22 +4,48 @@
     <meta charset="UTF-8">
     <title>books</title>
     <style>
+      body {
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+      }
+      /* Header styling */
+      .header {
+          margin: 0;
+          width: 100%;
+          background-color: #4CAF50; /* Green header background */
+          color: white;
+          padding: 15px; /* Reduced padding for a smaller header */
+          text-align: center;
+          font-size: 15px; /* Reduced font size */
+      }
+      /* Navigation links styling */
+      .nav-links {
+          display: inline-block; /* Aligns the links in a single row */
+          gap: 15px; /* Space between links */
+          justify-content: center; /* Centers the links within the container */
+      }
+      .nav-links a {
+          color: white; /* Link color */
+          text-decoration: none; /* Remove underline */
+          font-size: 16px; /* Reduced font size */
+          padding: 5px 10px; /* Slight padding */
+      }
       table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
+          border: 1px solid black;
+          border-collapse: collapse;
       }
       tr:nth-child(even) {
-        background-color: #D6EEEE;
+          background-color: #D6EEEE;
       }
       .container {
-        display: flex;    /* This makes the container a flex container */
+          display: flex; /* This makes the container a flex container */
       }
       .form-section {
-        width: 20%;      /* Takes 20% of the container width */
-        padding: 10px;
+          width: 20%; /* Takes 20% of the container width */
+          padding: 10px;
       }
       .table-section {
-          width: 80%;      /* Takes 80% of the container width */
+          width: 80%; /* Takes 80% of the container width */
           padding: 10px;
       }
       input[type="text"], input[type="number"] {
@@ -29,6 +55,17 @@
     </style>
 </head>
 <body>
+  <div class="header">
+    <h1>Library Manager</h1>
+      <div class="nav-links">
+        <a href="{{ url_for('home.index') }}">Home</a>
+        <a href="{{ url_for('books.index') }}">Books</a>
+        <a href="{{ url_for('members.index') }}">Members</a>
+        <a href="{{ url_for('issues.index') }}">Issue A Book</a>
+        <a href="{{ url_for('transactions.index') }}">Transactions</a>
+        <a href="{{ url_for('books.import_books') }}">Import Books</a>
+      </div>
+  </div>
   <div class="container">
     <div class="form-section">
       {% if page_uri == 'books' %}
