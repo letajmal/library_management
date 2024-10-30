@@ -13,13 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire application
 COPY . .
 
-# Make the startup script executable
-COPY startup.sh .
-RUN chmod +x startup.sh
-
 # Set environment variables
 ENV FLASK_APP=library_management
 ENV PORT=8080
 
-# Use the startup script as the entrypoint
-ENTRYPOINT ["./startup.sh"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=$PORT"]
