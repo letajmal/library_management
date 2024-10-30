@@ -17,4 +17,4 @@ COPY . .
 ENV FLASK_APP=library_management
 ENV PORT=8080
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=$PORT"]
+CMD ["sh", "-c", "flask run --host=0.0.0.0 --port=$PORT"]
